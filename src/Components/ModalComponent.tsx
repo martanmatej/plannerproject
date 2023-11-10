@@ -1,4 +1,4 @@
-import React, { useState, useContext } from "react";
+import React, { useState, useContext, useEffect } from "react";
 import Button from "react-bootstrap/Button";
 import Modal from "react-bootstrap/Modal";
 import DatePicker from "react-date-picker";
@@ -9,13 +9,27 @@ type ValuePiece = Date | null;
 
 type Value = ValuePiece | [ValuePiece, ValuePiece];
 
-export default function ModalComponent() {
-  const [showModal, setShowModal] = useGlobalState("viewModal");
+interface props{
+  modalShow: boolean,
+  onDataFromChild: (data: boolean) => void,
+}
+
+export default function ModalComponent(props: props) {
+  const [showModal, setShowModal] = useState(props.modalShow);
   const [value, onChange] = useState<Value>(new Date());
   const [minimalDate, setMinimalDate] = useGlobalState("minimalDate");
 
+  useEffect(() => {
+    setShowModal((prevShowModal) => {
+      if (prevShowModal !== props.modalShow) {
+        return props.modalShow;
+      }
+      return prevShowModal;
+    });
+  }, [props.modalShow]);
+
   const handleClose = () => {
-    setShowModal(false);
+    props.onDataFromChild(false);
   };
 
   return (
@@ -25,15 +39,11 @@ export default function ModalComponent() {
     >
       <Modal
         show={showModal}
-        onHide={() => {
-          handleClose();
-        }}
+        onHide={handleClose}
       >
         <Modal.Header
           closeButton
-          onClick={() => {
-            setShowModal(false);
-          }}
+          onClick={handleClose}
         >
           <Modal.Title>Nastavit zakázku</Modal.Title>
         </Modal.Header>
@@ -49,9 +59,7 @@ export default function ModalComponent() {
         <Modal.Footer>
           <Button
             variant="secondary"
-            onClick={() => {
-              handleClose();
-            }}
+            onClick={handleClose}
           >
             Zavřít
           </Button>

@@ -3,7 +3,6 @@ import ListGroup from "react-bootstrap/ListGroup";
 import Table from "react-bootstrap/Table";
 import ModalComponent from "./ModalComponent";
 import "bootstrap/dist/css/bootstrap.min.css";
-import { useGlobalState } from "../App";
 
 interface randomItems {
   id: number;
@@ -23,7 +22,7 @@ export default function ListComponent() {
       callendarArray: [],
     },
   ]);
-  const [showModal, setShowModal] = useGlobalState("viewModal");
+  const [showModal, setShowModal] = useState(false);
 
   function openModal() {
     setShowModal(true);
@@ -63,6 +62,10 @@ export default function ListComponent() {
     setRandomItems(fillArray(1, 20));
   }, []);
 
+  const getData = (data: boolean) => {
+    console.log(data);
+  };
+
   return (
     <>
       <Table
@@ -74,7 +77,6 @@ export default function ListComponent() {
           openModal();
         }}
       >
-        <ModalComponent />
         {randomItems.map((item: randomItems) => {
           return (
             <tbody style={{ width: "100%" }}>
@@ -95,6 +97,12 @@ export default function ListComponent() {
           );
         })}
       </Table>
+      <ModalComponent
+          modalShow={showModal}
+          onDataFromChild={(data) => {
+            setShowModal(data);
+          }}
+        />
     </>
   );
 }

@@ -5,7 +5,7 @@ import MainSite from "./Sites/MainSite";
 import { createGlobalState } from "react-hooks-global-state";
 
 const initialState = { viewModal: false, minimalDate: 0 };
-export const { useGlobalState } = createGlobalState(initialState);
+export const { useGlobalState, setGlobalState } = createGlobalState(initialState);
 
 function App() {
   const [modal, setModal] = useGlobalState("viewModal");
