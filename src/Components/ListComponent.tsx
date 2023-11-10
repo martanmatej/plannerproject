@@ -4,7 +4,7 @@ import Table from "react-bootstrap/Table";
 import ModalComponent from "./ModalComponent";
 import "bootstrap/dist/css/bootstrap.min.css";
 
-interface randomItems {
+export interface randomItems {
   id: number;
   name: string;
   dateStart: number;
@@ -22,9 +22,11 @@ export default function ListComponent() {
       callendarArray: [],
     },
   ]);
-  const [showModal, setShowModal] = useState(false);
+  const [showModal, setShowModal] = useState<boolean>(false);
+  const [rowId, setRowId] = useState<number>(0);
 
-  function openModal() {
+  function openModal(id: number) {
+    setRowId(id);
     setShowModal(true);
   }
 
@@ -62,10 +64,6 @@ export default function ListComponent() {
     setRandomItems(fillArray(1, 20));
   }, []);
 
-  const getData = (data: boolean) => {
-    console.log(data);
-  };
-
   return (
     <>
       <Table
@@ -73,13 +71,10 @@ export default function ListComponent() {
         bordered
         hover
         variant="dark"
-        onClick={() => {
-          openModal();
-        }}
       >
         {randomItems.map((item: randomItems) => {
           return (
-            <tbody style={{ width: "100%" }}>
+            <tbody style={{ width: "100%" }} key={item.id} onClick={() => {openModal(item.id)}}>
               <tr>
                 <td style={{ width: "5%" }}>{item.id}</td>
                 <td style={{ width: "10%" }}>{item.name}</td>
@@ -102,6 +97,8 @@ export default function ListComponent() {
           onDataFromChild={(data) => {
             setShowModal(data);
           }}
+          listInitial={randomItems}
+          rowId={rowId}
         />
     </>
   );
