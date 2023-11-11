@@ -27,7 +27,6 @@ export default function ListComponent() {
   ]);
   const [showModal, setShowModal] = useState<boolean>(false);
   const [rowId, setRowId] = useState<number>(0);
-
   function openModal(id: number) {
     setRowId(id);
     setShowModal(true);
@@ -44,13 +43,13 @@ export default function ListComponent() {
   function setColorSpan(itemState: string) {
     let value: string = "";
     switch (itemState) {
-      case arrayStates[0]:
+      case arrayStates[2]:
         value = "table-danger";
         break;
       case arrayStates[1]:
         value = "table-warning";
         break;
-      case arrayStates[2]:
+      case arrayStates[0]:
         value = "table-success";
         break;
     }
@@ -83,6 +82,7 @@ export default function ListComponent() {
   useEffect(() => {
     setRandomItems(fillArray(1, 20));
   }, []);
+
 
   return (
     <>

@@ -33,7 +33,9 @@ export default function ModalComponent(props: props) {
   });
 
   useEffect(() => {
+    setListStates(props.listInitial);
     handleDates(props.rowId);
+    handleStates();
     setShowModal((prevShowModal) => {
       if (prevShowModal !== props.modalShow) {
         return props.modalShow;
@@ -48,7 +50,7 @@ export default function ModalComponent(props: props) {
 
   function handleDates(id: number) {
     listStates.map((item) => {
-      if (item.id == id) {
+      if (item.id === id) {
         var dateObject = new Date();
         dateObject.setDate(item.dateStart);
         if (item.dateStart == 0) {
@@ -56,7 +58,6 @@ export default function ModalComponent(props: props) {
           dateObject.setMonth(dateObject.getMonth() + 1);
         }
         setStartDate(dateObject);
-        console.log('HERE : ' + item.currentState);
         switch (item.currentState) {
           case props.arrayStates[0]:
             setActiveButton({ first: true, middle: false, last: false });
