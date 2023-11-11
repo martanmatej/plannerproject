@@ -10,9 +10,11 @@ export interface randomItems {
   dateStart: number;
   dateEnd: number;
   callendarArray: number[];
+  currentState: string;
 }
 
 export default function ListComponent() {
+  const arrayStates: string[] = ["Nová", "V přípravě", "Hotová"];
   const [randomItems, setRandomItems] = useState<randomItems[]>([
     {
       id: Math.floor(Math.random() * 10),
@@ -20,6 +22,7 @@ export default function ListComponent() {
       dateStart: Math.floor(Math.random() * 20),
       dateEnd: Math.floor(Math.random() * 10),
       callendarArray: [],
+      currentState: arrayStates[0],
     },
   ]);
   const [showModal, setShowModal] = useState<boolean>(false);
@@ -38,6 +41,22 @@ export default function ListComponent() {
     return randomArray;
   }
 
+  function setColorSpan(itemState: string) {
+    let value: string = "";
+    switch (itemState) {
+      case arrayStates[0]:
+        value = "table-danger";
+        break;
+      case arrayStates[1]:
+        value = "table-warning";
+        break;
+      case arrayStates[2]:
+        value = "table-success";
+        break;
+    }
+    return value;
+  }
+
   function fillArray(start: number, stop: number) {
     var i = start;
     var items = [];
@@ -48,6 +67,7 @@ export default function ListComponent() {
         dateStart: Math.floor(Math.random() * (10 - 3 + 1)),
         dateEnd: Math.floor(Math.random() * (30 - 5 + 1)),
         callendarArray: generateRandomArray(stop - start),
+        currentState: arrayStates[Math.floor(Math.random() * 3)],
       };
       if (item.dateEnd < item.dateStart) {
         var switching = item.dateStart;
@@ -66,15 +86,10 @@ export default function ListComponent() {
 
   return (
     <>
-      <Table
-        striped
-        bordered
-        hover
-        variant="dark"
-      >
+      <Table striped bordered hover variant="dark" responsive="lg">
         {randomItems.map((item: randomItems) => {
           return (
-            <tbody style={{ width: "100%" }} key={item.id} onClick={() => {openModal(item.id)}}>
+            <tbody style={{ width: "100%" }} key={item.id}>
               <tr>
                 <td style={{ width: "5%" }}>{item.id}</td>
                 <td style={{ width: "10%" }}>{item.name}</td>
@@ -83,8 +98,15 @@ export default function ListComponent() {
                   if (item.callendarArray[index - 1] > value) {
                     style = "white";
                   }
+                  let classStyle = setColorSpan(item.currentState);
                   return (
-                    <td style={{ maxWidth: "1%", paddingRight: "50%" }}></td>
+                    <td
+                      style={{ maxWidth: "1%", paddingRight: "50%" }}
+                      className={classStyle}
+                      onClick={() => {
+                        openModal(item.id);
+                      }}
+                    ></td>
                   );
                 })}
               </tr>
@@ -93,13 +115,14 @@ export default function ListComponent() {
         })}
       </Table>
       <ModalComponent
-          modalShow={showModal}
-          onDataFromChild={(data) => {
-            setShowModal(data);
-          }}
-          listInitial={randomItems}
-          rowId={rowId}
-        />
+        modalShow={showModal}
+        onDataFromChild={(data) => {
+          setShowModal(data);
+        }}
+        listInitial={randomItems}
+        rowId={rowId}
+        arrayStates={arrayStates}
+      />
     </>
   );
 }
