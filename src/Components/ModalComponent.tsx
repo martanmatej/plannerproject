@@ -1,4 +1,4 @@
-import React, { useState, useContext, useEffect } from "react";
+import React, { useState, useContext, useEffect, MouseEventHandler } from "react";
 import Button from "react-bootstrap/Button";
 import Modal from "react-bootstrap/Modal";
 import Dropdown from "react-bootstrap/Dropdown";
@@ -35,14 +35,14 @@ export default function ModalComponent(props: props) {
   useEffect(() => {
     setListStates(props.listInitial);
     handleDates(props.rowId);
-    handleStates();
+    //handleStates();
     setShowModal((prevShowModal) => {
       if (prevShowModal !== props.modalShow) {
         return props.modalShow;
       }
       return prevShowModal;
     });
-  }, [props.modalShow]);
+  }, [props.modalShow, props.listInitial]);
 
   const handleClose = () => {
     props.onDataFromChild(false);
@@ -73,16 +73,14 @@ export default function ModalComponent(props: props) {
     });
   }
 
-  function handleStates() {
+  function handleStates(event: React.MouseEvent<HTMLElement, MouseEvent>) {
+    console.log(event.currentTarget.id);
     setListStates(prevListStates => 
       prevListStates.map(item => 
-        item.id === props.rowId ? {
+        item.currentState !== props.arrayStates[Number.parseInt(event.currentTarget.id)] ? {
           ...item,
           currentState:
-            activeButton.first === true ? props.arrayStates[0] :
-            activeButton.middle === true ? props.arrayStates[1] :
-            activeButton.last === true ? props.arrayStates[2] :
-            item.currentState
+          props.arrayStates[Number.parseInt(event.currentTarget.id)]
         } : item
       )
     );
@@ -105,13 +103,13 @@ export default function ModalComponent(props: props) {
           />
           Momentální stav zakázky.
           <DropdownButton id="dropdown-basic-button" title="Změna stavu">
-            <Dropdown.Item onClick={handleStates} active={activeButton.first}>
+            <Dropdown.Item onClick={handleStates} active={activeButton.first} id="0">
               {props.arrayStates[0]}
             </Dropdown.Item>
-            <Dropdown.Item onClick={handleStates} active={activeButton.middle}>
+            <Dropdown.Item onClick={handleStates} active={activeButton.middle} id="1">
               {props.arrayStates[1]}
             </Dropdown.Item>
-            <Dropdown.Item onClick={handleStates} active={activeButton.last}>
+            <Dropdown.Item onClick={handleStates} active={activeButton.last} id="2">
               {props.arrayStates[2]}
             </Dropdown.Item>
           </DropdownButton>
