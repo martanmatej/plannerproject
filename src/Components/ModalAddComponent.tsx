@@ -8,10 +8,6 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import "react-datepicker/dist/react-datepicker.css";
 import { randomItems } from "./ListComponent";
 
-type ValuePiece = Date | null;
-
-type Value = ValuePiece | [ValuePiece, ValuePiece];
-
 interface props {
   modalShow: boolean;
   onDataFromChild: (data: boolean) => void;
@@ -19,6 +15,12 @@ interface props {
   rowId: number;
   arrayStates: string[];
   listUpdate: (list: randomItems[]) => void;
+}
+
+interface updateState {
+  id: number;
+  name: string;
+  upperContract: number | null;
 }
 
 export default function ModalComponent(props: props) {
@@ -30,7 +32,6 @@ export default function ModalComponent(props: props) {
 
   useEffect(() => {
     setListStates(props.listInitial);
-    //handleStates();
     setShowModal((prevShowModal) => {
       if (prevShowModal !== props.modalShow) {
         return props.modalShow;
@@ -43,27 +44,25 @@ export default function ModalComponent(props: props) {
     props.onDataFromChild(false);
   };
 
-  const [firstDate, setFirstDate] = useState(true);
-
-  function handleSelectionDates(date: Date) {
-    setListStates((prevListStates) =>
-      prevListStates.map((item) =>
-        item.id === props.rowId
-          ? firstDate
-            ? {
-                ...item,
-                dateStart: date.getDate() + 1,
-              }
-            : { ...item, dateEnd: date.getDate() + 1 }
-          : item
-      )
-    );
-    setFirstDate(!firstDate);
+  function handleStateUpdate(data: updateState) {
+    const newItem: randomItems = {
+      id: data.id,
+      name: data.name,
+      upperContract: data.upperContract,
+      dateStart: -1,
+      dateEnd: -1,
+      callendarArray: [],
+      currentState: props.arrayStates[0],
+    };
+    setListStates((prevList) => {
+      const updatedList = [...prevList, newItem];
+      props.listUpdate(updatedList);
+      return updatedList;
+    });
+    setNameState("");
+    setIdState(0);
+    setErrorText("");
   }
-
-  useEffect(() => {
-    props.listUpdate(listStates);
-  }, [listStates]);
 
   return (
     <div
@@ -83,17 +82,27 @@ export default function ModalComponent(props: props) {
                 type="string"
                 value={idState}
                 onChange={(e) => {
-                  try {
-                    setIdState(Number.parseInt(e.target.value));
-                    setErrorText("");
-                    if (Number.isNaN(idState)) {
-                      setErrorText("Kód musí být číslo!");
-                      setIdState(0);
+                  const newId = Number.parseInt(e.target.value);
+
+                    const idExists = listStates.some(
+                      (item) => item.id === newId
+                    );
+
+                    if (idExists) {
+                      setErrorText("Zakázka s tímto ID už existuje");
+                      setIdState(newId);
+                    } else {
+                      setErrorText("");
+                      setIdState(newId);
+                      if (Number.isNaN(newId)) {
+                        setErrorText("Kód musí být číslo!");
+                        setIdState(0);
+                        return 0;
+                      } else {
+                        setIdState(newId);
+
+                      }
                     }
-                  } catch (e) {
-                    console.log(e);
-                    setIdState(0);
-                  }
                 }}
               />
               <Form.Label>Zadejte název zakázky:</Form.Label>
@@ -107,9 +116,11 @@ export default function ModalComponent(props: props) {
               <Form.Label>Zadejte nadřazenou zakázku:</Form.Label>
               <DropdownButton id="dropdown-basic-button" title="Zakázka">
                 {listStates.map((item) => {
-                    return <Dropdown.Item id={item.id.toString()} >
-                        {item.id}
+                  return (
+                    <Dropdown.Item id={item.id.toString()}>
+                      {item.id}
                     </Dropdown.Item>
+                  );
                 })}
               </DropdownButton>
             </Form.Group>
@@ -122,6 +133,11 @@ export default function ModalComponent(props: props) {
           <Button
             variant="primary"
             onClick={() => {
+              handleStateUpdate({
+                id: idState,
+                name: nameState,
+                upperContract: 100,
+              });
               handleClose();
             }}
           >

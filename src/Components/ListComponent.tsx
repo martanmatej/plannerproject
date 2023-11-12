@@ -11,6 +11,7 @@ export interface randomItems {
   dateEnd: number;
   callendarArray: number[];
   currentState: string;
+  upperContract: number | null;
 }
 
 export default function ListComponent() {
@@ -23,6 +24,7 @@ export default function ListComponent() {
       dateEnd: Math.floor(Math.random() * 10),
       callendarArray: [],
       currentState: arrayStates[0],
+      upperContract: null,
     },
   ]);
   const [showModal, setShowModal] = useState<boolean>(false);
@@ -68,6 +70,7 @@ export default function ListComponent() {
         dateEnd: Math.floor(Math.random() * (30 - 5 + 1)),
         callendarArray: generateRandomArray(stop - start),
         currentState: arrayStates[Math.floor(Math.random() * 3)],
+        upperContract: null,
       };
       if (item.dateEnd < item.dateStart) {
         var switching = item.dateStart;
