@@ -1,7 +1,7 @@
-import React, { useEffect, useState, useContext, createContext } from "react";
-import ListGroup from "react-bootstrap/ListGroup";
+import React, { useEffect, useState } from "react";
 import Table from "react-bootstrap/Table";
 import ModalComponent from "./ModalComponent";
+import ModalAddComponent from "./ModalAddComponent";
 import "bootstrap/dist/css/bootstrap.min.css";
 
 export interface randomItems {
@@ -26,6 +26,7 @@ export default function ListComponent() {
     },
   ]);
   const [showModal, setShowModal] = useState<boolean>(false);
+  const [addModal, setAddModal] = useState<boolean>(false);
   const [rowId, setRowId] = useState<number>(0);
   function openModal(id: number) {
     setRowId(id);
@@ -79,14 +80,40 @@ export default function ListComponent() {
     return items;
   }
 
+  function openModalAdd(id: number) {
+    setAddModal(true);
+  }
+
   useEffect(() => {
     setRandomItems(fillArray(1, 20));
   }, []);
 
-
   return (
     <>
+      <ModalAddComponent
+        modalShow={addModal}
+        onDataFromChild={(data) => {
+          setAddModal(data);
+        }}
+        listInitial={randomItems}
+        rowId={rowId}
+        arrayStates={arrayStates}
+        listUpdate={(data) => {
+          setRandomItems(data);
+          console.log(data[rowId].dateStart, data[rowId].dateEnd);
+        }}
+      />
       <Table striped bordered hover variant="dark" responsive="lg">
+        <thead
+          onClick={() => {
+            openModalAdd(rowId);
+          }}
+        >
+          <tr>
+            <td>+</td>
+            <td>Přidat zakázku</td>
+          </tr>
+        </thead>
         {randomItems.map((item: randomItems) => {
           return (
             <tbody style={{ width: "100%" }} key={item.id}>
@@ -122,6 +149,10 @@ export default function ListComponent() {
         listInitial={randomItems}
         rowId={rowId}
         arrayStates={arrayStates}
+        listUpdate={(data) => {
+          setRandomItems(data);
+          console.log(data[rowId].dateStart, data[rowId].dateEnd);
+        }}
       />
     </>
   );

@@ -1,11 +1,13 @@
-import React, { useState, useContext, useEffect, MouseEventHandler } from "react";
+import React, {
+  useState,
+  useEffect,
+} from "react";
 import Button from "react-bootstrap/Button";
 import Modal from "react-bootstrap/Modal";
 import Dropdown from "react-bootstrap/Dropdown";
 import DropdownButton from "react-bootstrap/DropdownButton";
 import DatePicker from "react-datepicker";
 import "bootstrap/dist/css/bootstrap.min.css";
-import { useGlobalState } from "../App";
 import "react-datepicker/dist/react-datepicker.css";
 import { randomItems } from "./ListComponent";
 
@@ -19,12 +21,12 @@ interface props {
   listInitial: randomItems[];
   rowId: number;
   arrayStates: string[];
+  listUpdate: (list: randomItems[]) => void;
 }
 
 export default function ModalComponent(props: props) {
   const [showModal, setShowModal] = useState(props.modalShow);
   const [listStates, setListStates] = useState(props.listInitial);
-  const [minimalDate, setMinimalDate] = useGlobalState("minimalDate");
   const [startDate, setStartDate] = useState(new Date());
   const [activeButton, setActiveButton] = useState({
     first: false,
@@ -74,17 +76,43 @@ export default function ModalComponent(props: props) {
   }
 
   function handleStates(event: React.MouseEvent<HTMLElement, MouseEvent>) {
-    console.log(event.currentTarget.id);
-    setListStates(prevListStates => 
-      prevListStates.map(item => 
-        item.currentState !== props.arrayStates[Number.parseInt(event.currentTarget.id)] ? {
-          ...item,
-          currentState:
-          props.arrayStates[Number.parseInt(event.currentTarget.id)]
-        } : item
+    setListStates((prevListStates) =>
+      prevListStates.map((item) =>
+        item.currentState !==
+          props.arrayStates[Number.parseInt(event.currentTarget.id)] &&
+        item.id === props.rowId
+          ? {
+              ...item,
+              currentState:
+                props.arrayStates[Number.parseInt(event.currentTarget.id)],
+            }
+          : item
       )
     );
   }
+  const [firstDate, setFirstDate] = useState(true);
+
+  function handleSelectionDates(date: Date) {
+    setListStates((prevListStates) =>
+      prevListStates.map((item) =>
+        item.id === props.rowId
+          ? firstDate
+            ? {
+                ...item,
+                dateStart: date.getDate()+1,
+              }
+            : {...item,
+              dateEnd: date.getDate()+1,
+            }
+          : item
+      )
+    );
+    setFirstDate(!firstDate);
+  }
+
+  useEffect(() => {
+    props.listUpdate(listStates);
+  }, [listStates]);
 
   return (
     <div
@@ -99,17 +127,35 @@ export default function ModalComponent(props: props) {
           Zde nastavte čas zakázky a uložte.
           <DatePicker
             selected={startDate}
-            onChange={(date: Date) => setStartDate(date)}
+            id="startDate"
+            onChange={(date: Date) => handleSelectionDates(date)}
+            selectsStart
+            startDate={new Date(listStates[props.rowId].dateStart)}
+            endDate={new Date(listStates[props.rowId].dateEnd)}
+            selectsEnd
+            inline
           />
           Momentální stav zakázky.
           <DropdownButton id="dropdown-basic-button" title="Změna stavu">
-            <Dropdown.Item onClick={handleStates} active={activeButton.first} id="0">
+            <Dropdown.Item
+              onClick={handleStates}
+              active={activeButton.first}
+              id="0"
+            >
               {props.arrayStates[0]}
             </Dropdown.Item>
-            <Dropdown.Item onClick={handleStates} active={activeButton.middle} id="1">
+            <Dropdown.Item
+              onClick={handleStates}
+              active={activeButton.middle}
+              id="1"
+            >
               {props.arrayStates[1]}
             </Dropdown.Item>
-            <Dropdown.Item onClick={handleStates} active={activeButton.last} id="2">
+            <Dropdown.Item
+              onClick={handleStates}
+              active={activeButton.last}
+              id="2"
+            >
               {props.arrayStates[2]}
             </Dropdown.Item>
           </DropdownButton>
