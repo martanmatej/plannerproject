@@ -33,6 +33,11 @@ export default function ModalComponent(props: props) {
     middle: false,
     last: false,
   });
+  const dateStart = new Date();
+  const dateEnd = new Date();
+  dateStart.setDate(listStates[props.rowId].dateStart);
+  dateEnd.setDate(listStates[props.rowId].dateEnd);
+
 
   useEffect(() => {
     setListStates(props.listInitial);
@@ -99,10 +104,10 @@ export default function ModalComponent(props: props) {
           ? firstDate
             ? {
                 ...item,
-                dateStart: date.getDate()+1,
+                dateStart: date.getDate(),
               }
             : {...item,
-              dateEnd: date.getDate()+1,
+              dateEnd: date.getDate(),
             }
           : item
       )
@@ -130,8 +135,8 @@ export default function ModalComponent(props: props) {
             id="startDate"
             onChange={(date: Date) => handleSelectionDates(date)}
             selectsStart
-            startDate={new Date(listStates[props.rowId].dateStart)}
-            endDate={new Date(listStates[props.rowId].dateEnd)}
+            startDate={dateStart}
+            endDate={dateEnd}
             selectsEnd
             inline
           />
