@@ -1,7 +1,4 @@
-import React, {
-  useState,
-  useEffect,
-} from "react";
+import React, { useState, useEffect } from "react";
 import Button from "react-bootstrap/Button";
 import Modal from "react-bootstrap/Modal";
 import Dropdown from "react-bootstrap/Dropdown";
@@ -38,10 +35,12 @@ export default function ModalComponent(props: props) {
   dateStart.setDate(listStates[props.rowId].dateStart);
   dateEnd.setDate(listStates[props.rowId].dateEnd);
 
+  useEffect(() => {
+    handleDates(props.rowId);
+  }, [dateEnd]);
 
   useEffect(() => {
     setListStates(props.listInitial);
-    handleDates(props.rowId);
     //handleStates();
     setShowModal((prevShowModal) => {
       if (prevShowModal !== props.modalShow) {
@@ -95,24 +94,30 @@ export default function ModalComponent(props: props) {
       )
     );
   }
-  const [firstDate, setFirstDate] = useState(true);
+  const [firstDateSelected, setFirstDateSelected] = useState(true);
 
   function handleSelectionDates(date: Date) {
-    setListStates((prevListStates) =>
-      prevListStates.map((item) =>
+    setListStates((prevListStates) => {
+      const updatedListState = prevListStates.map((item) =>
         item.id === props.rowId
-          ? firstDate
-            ? {
-                ...item,
-                dateStart: date.getDate(),
-              }
-            : {...item,
-              dateEnd: date.getDate(),
+          ? {
+              ...item,
+              dateStart: firstDateSelected ? date.getDate() : item.dateStart,
+              dateEnd: firstDateSelected ? item.dateEnd : date.getDate(),
             }
           : item
-      )
-    );
-    setFirstDate(!firstDate);
+      );
+
+      setFirstDateSelected(!firstDateSelected);
+
+      console.log(
+        "HELL ",
+        updatedListState[props.rowId].dateStart,
+        updatedListState[props.rowId].dateEnd
+      );
+
+      return updatedListState;
+    });
   }
 
   useEffect(() => {
