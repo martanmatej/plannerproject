@@ -34,7 +34,7 @@ export default function ListComponent() {
   const [rowId, setRowId] = useState<number>(0);
 
   function openModal(id: number) {
-    setRowId(id-1);
+    setRowId(id);
     setShowModal(true);
   }
 
@@ -99,7 +99,7 @@ export default function ListComponent() {
   }
 
   useEffect(() => {
-    setRandomItems(fillArray(1, 20));
+    setRandomItems(fillArray(0, 20));
   }, []);
 
   return (
@@ -159,7 +159,7 @@ export default function ListComponent() {
           return (
             <tbody style={{ width: "100%" }} key={item.id}>
               <tr>
-                <td style={{ width: "5%" }}>{item.id}</td>
+                <td style={{ width: "5%" }}>{item.id+1}</td>
                 <td style={{ width: "10%" }}>{item.name}</td>
                 {item.callendarArray.map((value, index) => {
                   let style = "dark";
@@ -174,13 +174,7 @@ export default function ListComponent() {
                         classStyle === "table-default" ? "empty-cell" : ""
                       }`}
                       onClick={() => {
-                        if (
-                          item.callendarArray.length > 0 &&
-                          item.dateStart !== undefined
-                        ){
-                          //console.log(item.id, item.dateStart, item.dateEnd);
-                          openModal(item.id);
-                        }
+                        openModal(item.id);
                       }}
                     ></td>
                   );

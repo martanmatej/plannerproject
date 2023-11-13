@@ -36,12 +36,8 @@ export default function ModalComponent(props: props) {
   dateEnd.setDate(listStates[props.rowId].dateEnd);
 
   useEffect(() => {
-    handleDates(props.rowId);
-  }, [dateEnd]);
-
-  useEffect(() => {
     setListStates(props.listInitial);
-    //handleStates();
+    handleDates(props.rowId);
     setShowModal((prevShowModal) => {
       if (prevShowModal !== props.modalShow) {
         return props.modalShow;
@@ -93,6 +89,7 @@ export default function ModalComponent(props: props) {
           : item
       )
     );
+    console.log(listStates[props.rowId].currentState);
   }
   const [firstDateSelected, setFirstDateSelected] = useState(true);
 
@@ -108,14 +105,15 @@ export default function ModalComponent(props: props) {
           : item
       );
 
+      if (!firstDateSelected) {
+        props.listUpdate(updatedListState);
+      }
       setFirstDateSelected(!firstDateSelected);
-
       console.log(
-        "HELL ",
+        "AA ",
         updatedListState[props.rowId].dateStart,
         updatedListState[props.rowId].dateEnd
       );
-
       return updatedListState;
     });
   }
