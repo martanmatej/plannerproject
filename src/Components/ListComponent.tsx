@@ -15,6 +15,14 @@ export interface randomItems {
   upperContract: number | null;
 }
 
+export function generateRandomArray(length: number): number[] {
+  const randomArray = [];
+  for (let j = 0; j < length + 1; j++) {
+    randomArray.push(Math.floor(Math.random() * (10 - 3 + 1)));
+  }
+  return randomArray;
+}
+
 export default function ListComponent() {
   const arrayStates: string[] = ["Nová", "V přípravě", "Hotová"];
   const [randomItems, setRandomItems] = useState<randomItems[]>([
@@ -38,13 +46,6 @@ export default function ListComponent() {
     setShowModal(true);
   }
 
-  function generateRandomArray(length: number): number[] {
-    const randomArray = [];
-    for (let j = 0; j < length + 1; j++) {
-      randomArray.push(Math.floor(Math.random() * (10 - 3 + 1)));
-    }
-    return randomArray;
-  }
 
   function setColorSpan(itemState: string) {
     let value: string = "";
@@ -71,7 +72,7 @@ export default function ListComponent() {
     for (i; i < stop - 1; i++) {
       var item: randomItems = {
         id: i,
-        name: "Zakazka " + Math.floor(Math.random() * (i - 2 + 1)),
+        name: "Zakazka " + Math.floor(Math.random() * (i - 2 + 2)),
         dateStart: Math.floor(Math.random() * (10 - 3 + 1)),
         dateEnd: Math.floor(Math.random() * (30 - 5 + 1)),
         callendarArray: generateRandomArray(stop - start),

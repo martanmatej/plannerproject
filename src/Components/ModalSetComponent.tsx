@@ -126,16 +126,13 @@ export default function ModalComponentSet(props: props) {
           </Form>
         </Modal.Body>
         <Modal.Footer>
-          <Button variant="secondary" onClick={handleClose}>
-            Zavřít
-          </Button>
           <Button
             variant="primary"
             onClick={() => {
               handleClose();
             }}
           >
-            Uložit
+            Zavřít
           </Button>
         </Modal.Footer>
       </Modal>

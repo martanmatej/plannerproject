@@ -46,7 +46,7 @@ export default function ModalComponent(props: props) {
 
   function handleStateUpdate(data: updateState) {
     const newItem: randomItems = {
-      id: data.id,
+      id: data.id-1,
       name: data.name,
       upperContract: data.upperContract,
       dateStart: -1,
@@ -127,9 +127,6 @@ export default function ModalComponent(props: props) {
           </Form>
         </Modal.Body>
         <Modal.Footer>
-          <Button variant="secondary" onClick={handleClose}>
-            Zavřít
-          </Button>
           <Button
             variant="primary"
             onClick={() => {
@@ -141,7 +138,7 @@ export default function ModalComponent(props: props) {
               handleClose();
             }}
           >
-            Uložit
+            Přidat
           </Button>
         </Modal.Footer>
       </Modal>

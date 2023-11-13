@@ -7,6 +7,7 @@ import DatePicker from "react-datepicker";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "react-datepicker/dist/react-datepicker.css";
 import { randomItems } from "./ListComponent";
+import { generateRandomArray } from "./ListComponent";
 
 type ValuePiece = Date | null;
 
@@ -89,9 +90,26 @@ export default function ModalComponent(props: props) {
           : item
       )
     );
-    console.log(listStates[props.rowId].currentState);
   }
   const [firstDateSelected, setFirstDateSelected] = useState(true);
+
+  function updateArrayColorObjects() {
+    setListStates((prevListStates) => {
+      const updatedList = prevListStates.map((item) =>
+        item.id === props.rowId
+          ? {
+              ...item,
+              callendarArray: generateRandomArray(
+                Math.max(1, item.dateEnd - item.dateStart)
+              ),
+            }
+          : item
+      );
+      console.log(listStates[props.rowId]);
+
+      return updatedList;
+    });
+  }
 
   function handleSelectionDates(date: Date) {
     setListStates((prevListStates) => {
@@ -101,24 +119,26 @@ export default function ModalComponent(props: props) {
               ...item,
               dateStart: firstDateSelected ? date.getDate() : item.dateStart,
               dateEnd: firstDateSelected ? item.dateEnd : date.getDate(),
+              callendarArray: generateRandomArray(
+                Math.max(1, item.dateEnd - item.dateStart)
+              ),
             }
           : item
       );
 
       if (!firstDateSelected) {
         props.listUpdate(updatedListState);
+        //updateArrayColorObjects();
+        console.log(updatedListState[props.rowId]);
       }
       setFirstDateSelected(!firstDateSelected);
-      console.log(
-        "AA ",
-        updatedListState[props.rowId].dateStart,
-        updatedListState[props.rowId].dateEnd
-      );
+
       return updatedListState;
     });
   }
 
   useEffect(() => {
+    //console.log(listStates[props.rowId]);
     props.listUpdate(listStates);
   }, [listStates]);
 
@@ -169,16 +189,13 @@ export default function ModalComponent(props: props) {
           </DropdownButton>
         </Modal.Body>
         <Modal.Footer>
-          <Button variant="secondary" onClick={handleClose}>
-            Zavřít
-          </Button>
           <Button
             variant="primary"
             onClick={() => {
               handleClose();
             }}
           >
-            Uložit
+            Zavřít
           </Button>
         </Modal.Footer>
       </Modal>
