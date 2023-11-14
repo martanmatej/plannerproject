@@ -45,9 +45,10 @@ export default function ModalComponent(props: props) {
       }
       return prevShowModal;
     });
-  }, [props.modalShow, props.listInitial]);
+  }, [props.modalShow, props.listInitial, props.rowId]);
 
   const handleClose = () => {
+    updateArrayColorObjects()
     props.onDataFromChild(false);
   };
 
@@ -93,7 +94,7 @@ export default function ModalComponent(props: props) {
   }
   const [firstDateSelected, setFirstDateSelected] = useState(true);
 
-  function updateArrayColorObjects() {
+  const updateArrayColorObjects = async() => {
     setListStates((prevListStates) => {
       const updatedList = prevListStates.map((item) =>
         item.id === props.rowId
@@ -105,8 +106,6 @@ export default function ModalComponent(props: props) {
             }
           : item
       );
-      console.log(listStates[props.rowId]);
-
       return updatedList;
     });
   }
@@ -125,22 +124,18 @@ export default function ModalComponent(props: props) {
             }
           : item
       );
-
-      if (!firstDateSelected) {
-        props.listUpdate(updatedListState);
-        //updateArrayColorObjects();
-        console.log(updatedListState[props.rowId]);
-      }
       setFirstDateSelected(!firstDateSelected);
 
       return updatedListState;
     });
   }
 
-  useEffect(() => {
-    //console.log(listStates[props.rowId]);
-    props.listUpdate(listStates);
-  }, [listStates]);
+  
+
+  useEffect(() =>{
+    updateArrayColorObjects();
+    props.listUpdate(listStates)
+  }, [props.modalShow])
 
   return (
     <div
@@ -191,9 +186,7 @@ export default function ModalComponent(props: props) {
         <Modal.Footer>
           <Button
             variant="primary"
-            onClick={() => {
-              handleClose();
-            }}
+            onClick={handleClose}
           >
             Zavřít
           </Button>
