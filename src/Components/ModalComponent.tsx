@@ -188,7 +188,7 @@ export default function ModalComponent(props: props) {
             variant="primary"
             onClick={handleClose}
           >
-            Zavřít
+            Uložit
           </Button>
         </Modal.Footer>
       </Modal>

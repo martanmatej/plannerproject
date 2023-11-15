@@ -1,12 +1,17 @@
 import React, { useState, useEffect } from "react";
 import Button from "react-bootstrap/Button";
 import Modal from "react-bootstrap/Modal";
-import Form from "react-bootstrap/Form";
 import Dropdown from "react-bootstrap/Dropdown";
 import DropdownButton from "react-bootstrap/DropdownButton";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "react-datepicker/dist/react-datepicker.css";
 import { randomItems } from "./ListComponent";
+import { generateRandomArray } from "./ListComponent";
+import DatePicker from "react-datepicker";
+
+type ValuePiece = Date | null;
+
+type Value = ValuePiece | [ValuePiece, ValuePiece];
 
 interface props {
   modalShow: boolean;
@@ -28,7 +33,15 @@ interface updateState {
 export default function ModalComponentSet(props: props) {
   const [showModal, setShowModal] = useState(props.modalShow);
   const [listStates, setListStates] = useState(props.listInitial);
-  const [idState, setIdState] = useState<number>(0);
+  const [startDate, setStartDate] = useState(new Date());
+  const [activeButton, setActiveButton] = useState({
+    first: true,
+    middle: false,
+    last: false,
+  });
+  const dateStart = new Date();
+  const dateEnd = new Date();
+ 
   const [nameState, setNameState] = useState<string>("");
   const [showError, setErrorText] = useState<string>("");
 
@@ -43,10 +56,90 @@ export default function ModalComponentSet(props: props) {
   }, [props.modalShow, props.listInitial]);
 
   const handleClose = () => {
+    updateArrayColorObjects()
     props.onDataFromChild(false);
   };
 
-  function handleStateUpdate(data: updateState) {
+
+  const updateArrayColorObjects = async() => {
+    setListStates((prevListStates) => {
+      const updatedList = prevListStates.map((item) =>
+        item.id === props.rowId
+          ? {
+              ...item,
+              callendarArray: generateRandomArray(
+                Math.max(1, item.dateEnd - item.dateStart)
+              ),
+            }
+          : item
+      );
+      return updatedList;
+    });
+  }
+
+  function handleSetup(id: number) {
+    listStates.map((item) => {
+      if (item.id === id) {
+        switch (item.currentState) {
+          case props.arrayStates[0]:
+            setActiveButton({ first: true, middle: false, last: false });
+            break;
+          case props.arrayStates[1]:
+            setActiveButton({ first: false, middle: true, last: false });
+            break;
+          case props.arrayStates[2]:
+            setActiveButton({ first: false, middle: false, last: true });
+            break;
+        }
+      }
+    });
+  }
+
+  function handleStates(event: React.MouseEvent<HTMLElement, MouseEvent>) {
+    setListStates((prevListStates) =>
+      prevListStates.map((item) =>
+        item.currentState !==
+          props.arrayStates[Number.parseInt(event.currentTarget.id)] &&
+        item.id === props.rowId
+          ? {
+              ...item,
+              currentState:
+                props.arrayStates[Number.parseInt(event.currentTarget.id)],
+            }
+          : item
+      ), 
+    );
+    handleSetup(props.rowId);
+  }
+  const [firstDateSelected, setFirstDateSelected] = useState(true);
+
+  function handleSelectionDates(date: Date) {
+    setListStates((prevListStates) => {
+      const updatedListState = prevListStates.map((item) =>
+        item.id === props.rowId
+          ? {
+              ...item,
+              dateStart: firstDateSelected ? date.getDate() : item.dateStart,
+              dateEnd: firstDateSelected ? item.dateEnd : date.getDate(),
+              callendarArray: generateRandomArray(
+                Math.max(1, item.dateEnd - item.dateStart)
+              ),
+            }
+          : item
+      );
+      setFirstDateSelected(!firstDateSelected);
+
+      return updatedListState;
+    });
+  }
+
+
+  useEffect(() =>{
+    updateArrayColorObjects();
+    props.listUpdate(listStates);
+  }, [props.modalShow])
+
+  /*function handleStateUpdate(data: updateState) {
     const newItem: randomItems = {
       id: data.id,
       name: listStates[data.id - 1].name,
@@ -65,7 +158,7 @@ export default function ModalComponentSet(props: props) {
     setIdState(0);
     setErrorText("");
   }
-
+*/
   return (
     <div
       className="modal show"
@@ -76,54 +169,41 @@ export default function ModalComponentSet(props: props) {
           <Modal.Title>Moje zakázka</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          <Form>
-            <Form.Group>
-              <Form.Label>Nastavte kód (číslo) zakázky:</Form.Label>
-              <p style={{ color: "red" }}>{showError}</p>
-              <Form.Control
-                type="string"
-                value={idState}
-                onChange={(e) => {
-                  const newId = Number.parseInt(e.target.value);
-
-                  const idExists = listStates.some((item) => item.id === newId);
-
-                  if (idExists) {
-                    setErrorText("Zakázka s tímto ID už existuje");
-                    setIdState(newId);
-                  } else {
-                    setErrorText("");
-                    setIdState(newId);
-                    if (Number.isNaN(newId)) {
-                      setErrorText("Kód musí být číslo!");
-                      setIdState(0);
-                      return 0;
-                    } else {
-                      setIdState(newId);
-                    }
-                  }
-                }}
-              />
-              <Form.Label>Zadejte název zakázky:</Form.Label>
-              <Form.Control
-                type="string"
-                value={nameState}
-                onChange={(e) => {
-                  setNameState(e.target.value);
-                }}
-              />
-              <Form.Label>Zadejte nadřazenou zakázku:</Form.Label>
-              <DropdownButton id="dropdown-basic-button" title="Zakázka">
-                {listStates.map((item) => {
-                  return (
-                    <Dropdown.Item id={item.id.toString()}>
-                      {item.id}
-                    </Dropdown.Item>
-                  );
-                })}
-              </DropdownButton>
-            </Form.Group>
-          </Form>
+          Zde nastavte čas zakázky a uložte.
+          <DatePicker
+            selected={startDate}
+            id="startDate"
+            onChange={(date: Date) => handleSelectionDates(date)}
+            selectsStart
+            startDate={dateStart}
+            endDate={dateEnd}
+            selectsEnd
+            inline
+          />
+          Nastavení stavu zakázky.
+          <DropdownButton id="dropdown-basic-button" title="Změna stavu">
+            <Dropdown.Item
+              onClick={handleStates}
+              active={activeButton.first}
+              id="0"
+            >
+              {props.arrayStates[0]}
+            </Dropdown.Item>
+            <Dropdown.Item
+              onClick={handleStates}
+              active={activeButton.middle}
+              id="1"
+            >
+              {props.arrayStates[1]}
+            </Dropdown.Item>
+            <Dropdown.Item
+              onClick={handleStates}
+              active={activeButton.last}
+              id="2"
+            >
+              {props.arrayStates[2]}
+            </Dropdown.Item>
+          </DropdownButton>
         </Modal.Body>
         <Modal.Footer>
           <Button
@@ -132,7 +212,7 @@ export default function ModalComponentSet(props: props) {
               handleClose();
             }}
           >
-            Zavřít
+            Uložit
           </Button>
         </Modal.Footer>
       </Modal>

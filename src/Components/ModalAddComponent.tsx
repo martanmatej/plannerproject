@@ -49,8 +49,8 @@ export default function ModalComponent(props: props) {
       id: data.id-1,
       name: data.name,
       upperContract: data.upperContract,
-      dateStart: -1,
-      dateEnd: -1,
+      dateStart: 1,
+      dateEnd: 1,
       callendarArray: [],
       currentState: props.arrayStates[0],
     };

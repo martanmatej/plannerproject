@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { Ref, useEffect, useRef, useState } from "react";
 import Table from "react-bootstrap/Table";
 import ModalComponent from "./ModalComponent";
 import ModalAddComponent from "./ModalAddComponent";
@@ -45,7 +45,6 @@ export default function ListComponent() {
     setRowId(id);
     setShowModal(true);
   }
-
 
   function setColorSpan(itemState: string) {
     let value: string = "";
@@ -129,23 +128,7 @@ export default function ListComponent() {
           setRandomItems(data);
         }}
       />
-      <Table
-        striped
-        bordered
-        hover
-        variant="dark"
-        responsive="lg"
-        onClick={() => {
-          /*randomItems.forEach((item) => {
-            if(item.callendarArray.length){
-              console.log(item.id ,item.dateEnd, item.dateStart)
-            }
-            if (item.id === rowId && item.callendarArray.length === 0 && item.currentState === '') {
-              openModalSet(rowId);
-            }
-          });*/
-        }}
-      >
+      <Table striped bordered hover variant="dark" responsive="lg">
         <thead
           onClick={() => {
             openModalAdd(rowId);
@@ -156,26 +139,44 @@ export default function ListComponent() {
             <td>Přidat zakázku</td>
           </tr>
         </thead>
-        {randomItems.map((item: randomItems) => {
+        {randomItems.map((item: randomItems, index: number) => {
           return (
-            <tbody style={{ width: "100%" }} key={item.id}>
+            <tbody style={{ width: "100%" }}>
               <tr>
-                <td style={{ width: "5%" }}>{item.id+1}</td>
-                <td style={{ width: "10%" }}>{item.name}</td>
-                {item.callendarArray.map((value, index) => {
+                <td
+                  style={{ width: "5%" }}
+                  onClick={() => {
+                    openModalSet(index);
+                  }}
+                >
+                  {item.id + 1}
+                </td>
+                <td
+                  style={{ width: "10%" }}
+                  onClick={() => {
+                    openModalSet(index);
+                  }}
+                >
+                  {item.name}
+                </td>
+                {item.callendarArray.map((value, count: number) => {
                   let style = "dark";
-                  if (item.callendarArray[index - 1] > value) {
+                  if (item.callendarArray[count - 1] > value) {
                     style = "white";
                   }
                   let classStyle = setColorSpan(item.currentState);
                   return (
                     <td
                       style={{ maxWidth: "1%", paddingRight: "50%" }}
-                      className={`${classStyle} ${
-                        classStyle === "table-default" ? "empty-cell" : ""
-                      }`}
-                      onClick={() => {
-                        openModal(item.id);
+                      className={`${classStyle}`}
+                      onClick={(e) => {
+                        if (
+                          e.currentTarget.className.match("table-success") ||
+                          e.currentTarget.className.match("table-warning") ||
+                          e.currentTarget.className.match("table-danger")
+                        ) {
+                          openModal(index);
+                        }
                       }}
                     ></td>
                   );
