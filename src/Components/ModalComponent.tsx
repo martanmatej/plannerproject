@@ -97,11 +97,11 @@ export default function ModalComponent(props: props) {
   const updateArrayColorObjects = async() => {
     setListStates((prevListStates) => {
       const updatedList = prevListStates.map((item) =>
-        item.id === props.rowId
+        item.rowIndex === props.rowId
           ? {
               ...item,
               callendarArray: generateRandomArray(
-                Math.max(1, item.dateEnd - item.dateStart)
+                item.dateEnd - item.dateStart
               ),
             }
           : item
@@ -119,7 +119,7 @@ export default function ModalComponent(props: props) {
               dateStart: firstDateSelected ? date.getDate() : item.dateStart,
               dateEnd: firstDateSelected ? item.dateEnd : date.getDate(),
               callendarArray: generateRandomArray(
-                Math.max(1, item.dateEnd - item.dateStart)
+                item.dateEnd - item.dateStart
               ),
             }
           : item
@@ -142,7 +142,7 @@ export default function ModalComponent(props: props) {
       className="modal show"
       style={{ display: "block", position: "initial", opacity: 1 }}
     >
-      <Modal show={showModal} onHide={handleClose} size="sm">
+      {showModal && <Modal show={showModal} onHide={handleClose} size="sm">
         <Modal.Header closeButton onClick={handleClose}>
           <Modal.Title>Nastavit zakázku</Modal.Title>
         </Modal.Header>
@@ -191,7 +191,8 @@ export default function ModalComponent(props: props) {
             Uložit
           </Button>
         </Modal.Footer>
-      </Modal>
+      </Modal>}
+      
     </div>
   );
 }

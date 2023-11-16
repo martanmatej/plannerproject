@@ -21,6 +21,7 @@ interface updateState {
   id: number;
   name: string;
   upperContract: number | null;
+  rowIndex: number;
 }
 
 export default function ModalComponent(props: props) {
@@ -32,12 +33,7 @@ export default function ModalComponent(props: props) {
 
   useEffect(() => {
     setListStates(props.listInitial);
-    setShowModal((prevShowModal) => {
-      if (prevShowModal !== props.modalShow) {
-        return props.modalShow;
-      }
-      return prevShowModal;
-    });
+    setShowModal(props.modalShow);
   }, [props.modalShow, props.listInitial]);
 
   const handleClose = () => {
@@ -46,13 +42,14 @@ export default function ModalComponent(props: props) {
 
   function handleStateUpdate(data: updateState) {
     const newItem: randomItems = {
-      id: data.id-1,
+      id: data.id - 1,
       name: data.name,
       upperContract: data.upperContract,
       dateStart: 1,
       dateEnd: 1,
       callendarArray: [],
       currentState: props.arrayStates[0],
+      rowIndex: listStates.length,
     };
     setListStates((prevList) => {
       const updatedList = [...prevList, newItem];
@@ -64,25 +61,32 @@ export default function ModalComponent(props: props) {
     setErrorText("");
   }
 
+  useEffect(() => {
+    if (!showModal) {
+      props.listUpdate(listStates);
+    }
+  }, [showModal, listStates]);
+
   return (
     <div
       className="modal show"
       style={{ display: "block", position: "initial", opacity: 1 }}
     >
-      <Modal show={showModal} onHide={handleClose} size="sm">
-        <Modal.Header closeButton onClick={handleClose}>
-          <Modal.Title>Přidat zakázku</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          <Form>
-            <Form.Group>
-              <Form.Label>Nastavte kód (číslo) zakázky:</Form.Label>
-              <p style={{ color: "red" }}>{showError}</p>
-              <Form.Control
-                type="string"
-                value={idState}
-                onChange={(e) => {
-                  const newId = Number.parseInt(e.target.value);
+      {showModal && (
+        <Modal show={showModal} onHide={handleClose} size="sm">
+          <Modal.Header closeButton onClick={handleClose}>
+            <Modal.Title>Přidat zakázku</Modal.Title>
+          </Modal.Header>
+          <Modal.Body>
+            <Form>
+              <Form.Group>
+                <Form.Label>Nastavte kód (číslo) zakázky:</Form.Label>
+                <p style={{ color: "red" }}>{showError}</p>
+                <Form.Control
+                  type="string"
+                  value={idState}
+                  onChange={(e) => {
+                    const newId = Number.parseInt(e.target.value);
 
                     const idExists = listStates.some(
                       (item) => item.id === newId
@@ -100,48 +104,49 @@ export default function ModalComponent(props: props) {
                         return 0;
                       } else {
                         setIdState(newId);
-
                       }
                     }
-                }}
-              />
-              <Form.Label>Zadejte název zakázky:</Form.Label>
-              <Form.Control
-                type="string"
-                value={nameState}
-                onChange={(e) => {
-                  setNameState(e.target.value);
-                }}
-              />
-              <Form.Label>Zadejte nadřazenou zakázku:</Form.Label>
-              <DropdownButton id="dropdown-basic-button" title="Zakázka">
-                {listStates.map((item) => {
-                  return (
-                    <Dropdown.Item id={item.id.toString()}>
-                      {item.id}
-                    </Dropdown.Item>
-                  );
-                })}
-              </DropdownButton>
-            </Form.Group>
-          </Form>
-        </Modal.Body>
-        <Modal.Footer>
-          <Button
-            variant="primary"
-            onClick={() => {
-              handleStateUpdate({
-                id: idState,
-                name: nameState,
-                upperContract: 100,
-              });
-              handleClose();
-            }}
-          >
-            Přidat
-          </Button>
-        </Modal.Footer>
-      </Modal>
+                  }}
+                />
+                <Form.Label>Zadejte název zakázky:</Form.Label>
+                <Form.Control
+                  type="string"
+                  value={nameState}
+                  onChange={(e) => {
+                    setNameState(e.target.value);
+                  }}
+                />
+                <Form.Label>Zadejte nadřazenou zakázku:</Form.Label>
+                <DropdownButton id="dropdown-basic-button" title="Zakázka">
+                  {listStates.map((item) => {
+                    return (
+                      <Dropdown.Item id={item.id.toString()}>
+                        {item.id}
+                      </Dropdown.Item>
+                    );
+                  })}
+                </DropdownButton>
+              </Form.Group>
+            </Form>
+          </Modal.Body>
+          <Modal.Footer>
+            <Button
+              variant="primary"
+              onClick={() => {
+                handleStateUpdate({
+                  id: idState,
+                  name: nameState,
+                  upperContract: 100,
+                  rowIndex: props.rowId,
+                });
+                handleClose();
+              }}
+            >
+              Přidat
+            </Button>
+          </Modal.Footer>
+        </Modal>
+      )}
     </div>
   );
 }

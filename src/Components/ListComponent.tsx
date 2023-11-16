@@ -1,10 +1,17 @@
-import React, { Ref, useEffect, useRef, useState } from "react";
+import React, {
+  MouseEventHandler,
+  Ref,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import Table from "react-bootstrap/Table";
 import ModalComponent from "./ModalComponent";
 import ModalAddComponent from "./ModalAddComponent";
 import ModalSetComponent from "./ModalSetComponent";
 import "bootstrap/dist/css/bootstrap.min.css";
-
+import { faTrashAlt } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 export interface randomItems {
   id: number;
   name: string;
@@ -13,6 +20,7 @@ export interface randomItems {
   callendarArray: number[];
   currentState: string;
   upperContract: number | null;
+  rowIndex: number;
 }
 
 export function generateRandomArray(length: number): number[] {
@@ -34,6 +42,7 @@ export default function ListComponent() {
       callendarArray: [],
       currentState: arrayStates[0],
       upperContract: null,
+      rowIndex: 0,
     },
   ]);
   const [showModal, setShowModal] = useState<boolean>(false);
@@ -44,6 +53,23 @@ export default function ListComponent() {
   function openModal(id: number) {
     setRowId(id);
     setShowModal(true);
+  }
+
+  const [buttonRemoveApproval, setButtonRemoveApproval] =
+    useState<boolean>(false);
+
+  function enableRemove(rowId: number, indexArray: number) {
+    let lastIndex = randomItems[rowId]?.callendarArray.length - 1;
+    if (lastIndex === indexArray) {
+      setButtonRemoveApproval(true);
+    }
+  }
+
+  function disableRemove(rowId: number, indexArray: number) {
+    let lastIndex = randomItems[rowId].callendarArray.length - 1;
+    if (lastIndex === indexArray) {
+      setButtonRemoveApproval(false);
+    }
   }
 
   function setColorSpan(itemState: string) {
@@ -77,6 +103,7 @@ export default function ListComponent() {
         callendarArray: generateRandomArray(stop - start),
         currentState: arrayStates[Math.floor(Math.random() * 3)],
         upperContract: null,
+        rowIndex: i,
       };
       if (item.dateEnd < item.dateStart) {
         var switching = item.dateStart;
@@ -165,6 +192,7 @@ export default function ListComponent() {
                     style = "white";
                   }
                   let classStyle = setColorSpan(item.currentState);
+                  let lastIndex = item.callendarArray.length - 1;
                   return (
                     <td
                       style={{ maxWidth: "1%", paddingRight: "50%" }}
@@ -178,7 +206,24 @@ export default function ListComponent() {
                           openModal(index);
                         }
                       }}
-                    ></td>
+                      onMouseEnter={(e) => enableRemove(item.rowIndex, count)}
+                      onMouseLeave={(e) => disableRemove(item.rowIndex, count)}
+                    >
+                      {buttonRemoveApproval && lastIndex === count && (
+                        <FontAwesomeIcon
+                          icon={faTrashAlt}
+                          size="sm"
+                          style={{ float: "left" }}
+                          onClick={() => {
+                            setShowModal(false);
+                            setButtonRemoveApproval(false);
+                            item.callendarArray = [];
+                            item.dateStart = 1;
+                            item.dateEnd = 1;
+                          }}
+                        />
+                      )}
+                    </td>
                   );
                 })}
               </tr>

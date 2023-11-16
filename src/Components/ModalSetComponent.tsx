@@ -8,6 +8,8 @@ import "react-datepicker/dist/react-datepicker.css";
 import { randomItems } from "./ListComponent";
 import { generateRandomArray } from "./ListComponent";
 import DatePicker from "react-datepicker";
+import { faLightbulb } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 type ValuePiece = Date | null;
 
@@ -41,45 +43,72 @@ export default function ModalComponentSet(props: props) {
   });
   const dateStart = new Date();
   const dateEnd = new Date();
- 
+
   const [nameState, setNameState] = useState<string>("");
   const [showError, setErrorText] = useState<string>("");
 
   useEffect(() => {
     setListStates(props.listInitial);
-    setShowModal((prevShowModal) => {
-      if (prevShowModal !== props.modalShow) {
-        return props.modalShow;
-      }
-      return prevShowModal;
-    });
+    handleSetup(props.rowId);
+    handleDates(props.rowId);
+    setShowModal(props.modalShow);
   }, [props.modalShow, props.listInitial]);
 
+  useEffect(() => {
+    setListStates(props.listInitial);
+    handleSetup(props.rowId);
+  }, [props.listInitial]);
+
   const handleClose = () => {
-    updateArrayColorObjects()
+    updateArrayColorObjects();
     props.onDataFromChild(false);
   };
 
+  function handleDates(id: number) {
+    listStates.map((item) => {
+      if (item.id === id) {
+        var dateObject = new Date();
+        dateObject.setDate(item.dateStart);
+        if (item.dateStart == 0) {
+          dateObject.setDate(item.dateStart + 1);
+          dateObject.setMonth(dateObject.getMonth() + 1);
+        }
+        setStartDate(dateObject);
+        switch (item.currentState) {
+          case props.arrayStates[0]:
+            setActiveButton({ first: true, middle: false, last: false });
+            break;
+          case props.arrayStates[1]:
+            setActiveButton({ first: false, middle: true, last: false });
+            break;
+          case props.arrayStates[2]:
+            setActiveButton({ first: false, middle: false, last: true });
+            break;
+        }
+      }
+    });
+    updateArrayColorObjects();
+  }
 
-  const updateArrayColorObjects = async() => {
+  const updateArrayColorObjects = async () => {
     setListStates((prevListStates) => {
       const updatedList = prevListStates.map((item) =>
-        item.id === props.rowId
+        item.rowIndex === props.rowId
           ? {
               ...item,
               callendarArray: generateRandomArray(
-                Math.max(1, item.dateEnd - item.dateStart)
+                item.dateEnd - item.dateStart
               ),
             }
           : item
       );
       return updatedList;
     });
-  }
+  };
 
   function handleSetup(id: number) {
     listStates.map((item) => {
-      if (item.id === id) {
+      if (item.rowIndex === id) {
         switch (item.currentState) {
           case props.arrayStates[0]:
             setActiveButton({ first: true, middle: false, last: false });
@@ -97,47 +126,49 @@ export default function ModalComponentSet(props: props) {
 
   function handleStates(event: React.MouseEvent<HTMLElement, MouseEvent>) {
     setListStates((prevListStates) =>
-      prevListStates.map((item) =>
+      prevListStates.map((item, index) =>
         item.currentState !==
           props.arrayStates[Number.parseInt(event.currentTarget.id)] &&
-        item.id === props.rowId
+        item.rowIndex === props.rowId
           ? {
               ...item,
               currentState:
                 props.arrayStates[Number.parseInt(event.currentTarget.id)],
             }
           : item
-      ), 
+      )
     );
-    handleSetup(props.rowId);
   }
   const [firstDateSelected, setFirstDateSelected] = useState(true);
 
+  // This function is triggered when a date is selected.
+  // It updates the start and end dates of the selected item in the list.
+  // It also updates the array of random numbers for the selected item.
   function handleSelectionDates(date: Date) {
     setListStates((prevListStates) => {
       const updatedListState = prevListStates.map((item) =>
-        item.id === props.rowId
+        item.rowIndex === props.rowId
           ? {
               ...item,
               dateStart: firstDateSelected ? date.getDate() : item.dateStart,
               dateEnd: firstDateSelected ? item.dateEnd : date.getDate(),
-              callendarArray: generateRandomArray(
-                Math.max(1, item.dateEnd - item.dateStart)
-              ),
             }
           : item
       );
+      // Call props.listUpdate with the updated list state
       setFirstDateSelected(!firstDateSelected);
-
       return updatedListState;
     });
   }
 
-
-  useEffect(() =>{
+  useEffect(() => {
     updateArrayColorObjects();
     props.listUpdate(listStates);
-  }, [props.modalShow])
+    console.log(
+      listStates[props.rowId].dateStart,
+      listStates[props.rowId].dateEnd
+    );
+  }, [props.modalShow]);
 
   /*function handleStateUpdate(data: updateState) {
     const newItem: randomItems = {
@@ -204,6 +235,11 @@ export default function ModalComponentSet(props: props) {
               {props.arrayStates[2]}
             </Dropdown.Item>
           </DropdownButton>
+          <br/>
+          <FontAwesomeIcon icon={faLightbulb} size="lg" flip="horizontal" />{" "}
+          Použití
+          <li style={{ fontSize: 14 }}>Klikněte na datum začátku a následně konce data zakázky.</li>
+          <li style={{ fontSize: 14 }}>Nyní vyberte stav zakázky.</li>
         </Modal.Body>
         <Modal.Footer>
           <Button
