@@ -196,7 +196,7 @@ export default function ListComponent() {
                   return (
                     <td
                       style={{ paddingRight: "50%"}}
-                      width={1}
+                      width={1.1}
                       className={`${classStyle}`}
                       onClick={(e) => {
                         if (
