@@ -1,8 +1,5 @@
 import React, {
-  MouseEventHandler,
-  Ref,
   useEffect,
-  useRef,
   useState,
 } from "react";
 import Table from "react-bootstrap/Table";
@@ -12,6 +9,7 @@ import ModalSetComponent from "./ModalSetComponent";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { faTrashAlt } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { Container, Row, Col } from 'react-bootstrap';
 export interface randomItems {
   id: number;
   name: string;
@@ -155,7 +153,8 @@ export default function ListComponent() {
           setRandomItems(data);
         }}
       />
-      <Table striped bordered hover variant="dark" responsive="lg">
+      
+      <Table striped bordered hover variant="dark" responsive="lg" style={{height: '90%', width: '100%'}}>
         <thead
           onClick={() => {
             openModalAdd(rowId);
@@ -164,6 +163,7 @@ export default function ListComponent() {
           <tr>
             <td>+</td>
             <td>Přidat zakázku</td>
+            
           </tr>
         </thead>
         {randomItems.map((item: randomItems, index: number) => {
@@ -171,7 +171,7 @@ export default function ListComponent() {
             <tbody style={{ width: "100%" }}>
               <tr>
                 <td
-                  style={{ width: "5%" }}
+                  style={{ width: "5%"}}
                   onClick={() => {
                     openModalSet(index);
                   }}
@@ -179,7 +179,7 @@ export default function ListComponent() {
                   {item.id + 1}
                 </td>
                 <td
-                  style={{ width: "10%" }}
+                  style={{ width: "10%"}}
                   onClick={() => {
                     openModalSet(index);
                   }}
@@ -195,7 +195,8 @@ export default function ListComponent() {
                   let lastIndex = item.callendarArray.length - 1;
                   return (
                     <td
-                      style={{ maxWidth: "1%", paddingRight: "50%" }}
+                      style={{ paddingRight: "50%"}}
+                      width={1}
                       className={`${classStyle}`}
                       onClick={(e) => {
                         if (
@@ -213,8 +214,9 @@ export default function ListComponent() {
                         <FontAwesomeIcon
                           icon={faTrashAlt}
                           size="sm"
-                          style={{ float: "left" }}
-                          onClick={() => {
+                          style={{ position: 'absolute' }}
+                          onClick={(e) => {
+                            e.stopPropagation();
                             setShowModal(false);
                             setButtonRemoveApproval(false);
                             item.callendarArray = [];

@@ -33,7 +33,7 @@ export default function DatesComponent() {
         data-bs-theme="dark"
       >
         <Container fluid>
-          <Navbar.Collapse className="me-auto">
+          <Navbar.Collapse className="responsive-navbar-nav">
             <Navbar.Text
               style={{
                 display: "flex",
@@ -64,6 +64,7 @@ export default function DatesComponent() {
                     paddingLeft: 4,
                     display: "flex",
                     flexDirection: "column",
+                    width: '2.5%'
                   }}
                 >
                   {item.getDate()}.{item.getMonth()}

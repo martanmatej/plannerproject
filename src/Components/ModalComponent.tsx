@@ -134,7 +134,8 @@ export default function ModalComponent(props: props) {
 
   useEffect(() =>{
     updateArrayColorObjects();
-    props.listUpdate(listStates)
+    props.listUpdate(listStates);
+    
   }, [props.modalShow])
 
   return (
