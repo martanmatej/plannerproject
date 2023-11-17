@@ -96,9 +96,9 @@ export default function ModalComponentSet(props: props) {
         item.rowIndex === props.rowId
           ? {
               ...item,
-              callendarArray: generateRandomArray(
+              callendarArray: [generateRandomArray(
                 item.dateEnd - item.dateStart
-              ),
+              )],
             }
           : item
       );
@@ -164,10 +164,6 @@ export default function ModalComponentSet(props: props) {
   useEffect(() => {
     updateArrayColorObjects();
     props.listUpdate(listStates);
-    console.log(
-      listStates[props.rowId].dateStart,
-      listStates[props.rowId].dateEnd
-    );
   }, [props.modalShow]);
 
   /*function handleStateUpdate(data: updateState) {

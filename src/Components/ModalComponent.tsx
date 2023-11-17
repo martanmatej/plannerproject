@@ -100,9 +100,9 @@ export default function ModalComponent(props: props) {
         item.rowIndex === props.rowId
           ? {
               ...item,
-              callendarArray: generateRandomArray(
+              callendarArray: [generateRandomArray(
                 item.dateEnd - item.dateStart
-              ),
+              )],
             }
           : item
       );
@@ -118,9 +118,9 @@ export default function ModalComponent(props: props) {
               ...item,
               dateStart: firstDateSelected ? date.getDate() : item.dateStart,
               dateEnd: firstDateSelected ? item.dateEnd : date.getDate(),
-              callendarArray: generateRandomArray(
+              callendarArray: [generateRandomArray(
                 item.dateEnd - item.dateStart
-              ),
+              )],
             }
           : item
       );

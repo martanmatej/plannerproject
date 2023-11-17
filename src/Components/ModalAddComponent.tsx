@@ -20,7 +20,7 @@ interface props {
 interface updateState {
   id: number;
   name: string;
-  upperContract: number | null;
+  upperContract: number[];
   rowIndex: number;
 }
 
@@ -30,6 +30,7 @@ export default function ModalComponent(props: props) {
   const [idState, setIdState] = useState<number>(0);
   const [nameState, setNameState] = useState<string>("");
   const [showError, setErrorText] = useState<string>("");
+  const [selectedUpperContract, setSelectedUpperContract] = useState<number[]>();
 
   useEffect(() => {
     setListStates(props.listInitial);
@@ -59,12 +60,14 @@ export default function ModalComponent(props: props) {
     setNameState("");
     setIdState(0);
     setErrorText("");
+    setSelectedUpperContract([]);
   }
 
   useEffect(() => {
     if (!showModal) {
       props.listUpdate(listStates);
     }
+    //console.log(listStates);
   }, [showModal, listStates]);
 
   return (
@@ -120,7 +123,11 @@ export default function ModalComponent(props: props) {
                 <DropdownButton id="dropdown-basic-button" title="Zakázka">
                   {listStates.map((item) => {
                     return (
-                      <Dropdown.Item id={item.id.toString()}>
+                      <Dropdown.Item
+                        id={item.id.toString()}
+                        onClick={(e) => {
+                          setSelectedUpperContract([...item.upperContract, item.rowIndex]);                        }}
+                      >
                         {item.id}
                       </Dropdown.Item>
                     );
@@ -136,7 +143,7 @@ export default function ModalComponent(props: props) {
                 handleStateUpdate({
                   id: idState,
                   name: nameState,
-                  upperContract: 100,
+                  upperContract: [],
                   rowIndex: props.rowId,
                 });
                 handleClose();
