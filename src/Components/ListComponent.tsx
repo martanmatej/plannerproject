@@ -59,7 +59,7 @@ export default function ListComponent() {
     indexOfContract: number
   ) {
     let lastIndex =
-      randomItems[rowId]?.callendarArray[indexOfContract].length - 1;
+      randomItems[rowId]?.callendarArray[indexOfContract]?.length - 1;
     if (lastIndex === indexArray) {
       setButtonRemoveApproval(true);
     }
@@ -72,7 +72,7 @@ export default function ListComponent() {
     indexOfContract: number
   ) {
     let lastIndex =
-      randomItems[rowId].callendarArray[indexOfContract].length - 1;
+      randomItems[rowId].callendarArray[indexOfContract]?.length - 1;
     if (lastIndex === indexArray) {
       setButtonRemoveApproval(false);
     }
@@ -233,7 +233,7 @@ export default function ListComponent() {
                             }
                             let classStyle = setColorSpan(item.currentState);
                             let lastIndex =
-                              item.callendarArray[indexArray].length - 1;
+                              item.callendarArray[indexArray]?.length - 1;
                             return (
                               <>
                                 <td
@@ -317,6 +317,7 @@ export default function ListComponent() {
     </>
   );
 }
+
 
 export function generateAddingCells(numberOfItems: number) {
   let cells = [];
