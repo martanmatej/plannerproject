@@ -1,7 +1,4 @@
-import React, {
-  useEffect,
-  useState,
-} from "react";
+import React, { useEffect, useState } from "react";
 import Table from "react-bootstrap/Table";
 import ModalComponent from "./ModalComponent";
 import ModalAddComponent from "./ModalAddComponent";
@@ -9,7 +6,7 @@ import ModalSetComponent from "./ModalSetComponent";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { faTrashAlt } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { Container, Row, Col } from 'react-bootstrap';
+import { Container, Row, Col } from "react-bootstrap";
 export interface randomItems {
   id: number;
   name: string;
@@ -61,6 +58,7 @@ export default function ListComponent() {
     if (lastIndex === indexArray) {
       setButtonRemoveApproval(true);
     }
+    setRowId(rowId);
   }
 
   function disableRemove(rowId: number, indexArray: number) {
@@ -153,8 +151,15 @@ export default function ListComponent() {
           setRandomItems(data);
         }}
       />
-      
-      <Table striped bordered hover variant="dark" responsive="lg" style={{height: '90%', width: '100%'}}>
+
+      <Table
+        striped
+        bordered
+        hover
+        variant="dark"
+        responsive="lg"
+        style={{ height: "90%", width: "100%" }}
+      >
         <thead
           onClick={() => {
             openModalAdd(rowId);
@@ -163,7 +168,6 @@ export default function ListComponent() {
           <tr>
             <td>+</td>
             <td>Přidat zakázku</td>
-            
           </tr>
         </thead>
         {randomItems.map((item: randomItems, index: number) => {
@@ -171,7 +175,7 @@ export default function ListComponent() {
             <tbody style={{ width: "100%" }}>
               <tr>
                 <td
-                  style={{ width: "5%"}}
+                  style={{ width: "5%" }}
                   onClick={() => {
                     openModalSet(index);
                   }}
@@ -179,7 +183,7 @@ export default function ListComponent() {
                   {item.id + 1}
                 </td>
                 <td
-                  style={{ width: "10%"}}
+                  style={{ width: "10%" }}
                   onClick={() => {
                     openModalSet(index);
                   }}
@@ -195,7 +199,7 @@ export default function ListComponent() {
                   let lastIndex = item.callendarArray.length - 1;
                   return (
                     <td
-                      style={{ paddingRight: "50%"}}
+                      style={{ paddingRight: "50%" }}
                       width={1.1}
                       className={`${classStyle}`}
                       onClick={(e) => {
@@ -210,21 +214,23 @@ export default function ListComponent() {
                       onMouseEnter={(e) => enableRemove(item.rowIndex, count)}
                       onMouseLeave={(e) => disableRemove(item.rowIndex, count)}
                     >
-                      {buttonRemoveApproval && lastIndex === count && (
-                        <FontAwesomeIcon
-                          icon={faTrashAlt}
-                          size="sm"
-                          style={{ position: 'absolute' }}
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            setShowModal(false);
-                            setButtonRemoveApproval(false);
-                            item.callendarArray = [];
-                            item.dateStart = 1;
-                            item.dateEnd = 1;
-                          }}
-                        />
-                      )}
+                      {buttonRemoveApproval &&
+                        lastIndex === count &&
+                        item.rowIndex === rowId && (
+                          <FontAwesomeIcon
+                            icon={faTrashAlt}
+                            size="sm"
+                            style={{ position: "absolute" }}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setShowModal(false);
+                              setButtonRemoveApproval(false);
+                              item.callendarArray = [];
+                              item.dateStart = 1;
+                              item.dateEnd = 1;
+                            }}
+                          />
+                        )}
                     </td>
                   );
                 })}

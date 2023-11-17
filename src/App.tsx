@@ -1,5 +1,4 @@
 import React from "react";
-import logo from "./logo.svg";
 import "./App.css";
 import MainSite from "./Sites/MainSite";
 import { createGlobalState } from "react-hooks-global-state";

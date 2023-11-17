@@ -21,7 +21,7 @@ export default function DatesComponent() {
   }
 
   useEffect(() => {
-    setDate(getDaysInMonth(date.getMonth() + 1, date.getFullYear()));
+    setDate(getDaysInMonth(date.getMonth(), date.getFullYear()));
     setMinimalDate(date.getMonth() + 1);
   }, []);
 
@@ -67,7 +67,7 @@ export default function DatesComponent() {
                     width: '2.5%'
                   }}
                 >
-                  {item.getDate()}.{item.getMonth()}
+                  {item.getDate()}.{item.getMonth() + 1}
                 </Navbar.Text>
               );
             })}
