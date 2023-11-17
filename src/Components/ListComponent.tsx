@@ -125,6 +125,8 @@ export default function ListComponent() {
     setRandomItems(fillArray(0, 20));
   }, []);
 
+  const dateObject = new Date();
+
   return (
     <>
       <ModalAddComponent
@@ -160,14 +162,29 @@ export default function ListComponent() {
         responsive="lg"
         style={{ height: "90%", width: "100%" }}
       >
-        <thead
-          onClick={() => {
-            openModalAdd(rowId);
-          }}
-        >
+        <thead>
           <tr>
-            <td>+</td>
-            <td>Přidat zakázku</td>
+            <td
+              onClick={() => {
+                openModalAdd(rowId);
+              }}
+            >
+              +
+            </td>
+            <td
+              onClick={() => {
+                openModalAdd(rowId);
+              }}
+            >
+              Přidat zakázku
+            </td>
+            {generateAddingCells(
+              new Date(
+                dateObject.getFullYear(),
+                dateObject.getMonth(),
+                0
+              ).getDate()
+            )}
           </tr>
         </thead>
         {randomItems.map((item: randomItems, index: number) => {
@@ -253,4 +270,12 @@ export default function ListComponent() {
       />
     </>
   );
+}
+
+export function generateAddingCells(numberOfItems: number) {
+  let cells = [];
+  for (let index = 1; index < numberOfItems; index++) {
+    cells.push(<td key={index} style={{ paddingRight: "50%" }} width={1.1} />);
+  }
+  return cells;
 }
