@@ -12,9 +12,9 @@ export interface randomItems {
   name: string;
   dateStart: number;
   dateEnd: number;
-  callendarArray: number[];
+  callendarArray: number[][];
   currentState: string;
-  upperContract: number | null;
+  upperContract: number[];
   rowIndex: number;
 }
 
@@ -36,7 +36,7 @@ export default function ListComponent() {
       dateEnd: Math.floor(Math.random() * 10),
       callendarArray: [],
       currentState: arrayStates[0],
-      upperContract: null,
+      upperContract: [],
       rowIndex: 0,
     },
   ]);
@@ -53,16 +53,26 @@ export default function ListComponent() {
   const [buttonRemoveApproval, setButtonRemoveApproval] =
     useState<boolean>(false);
 
-  function enableRemove(rowId: number, indexArray: number) {
-    let lastIndex = randomItems[rowId]?.callendarArray.length - 1;
+  function enableRemove(
+    rowId: number,
+    indexArray: number,
+    indexOfContract: number
+  ) {
+    let lastIndex =
+      randomItems[rowId]?.callendarArray[indexOfContract]?.length - 1;
     if (lastIndex === indexArray) {
       setButtonRemoveApproval(true);
     }
     setRowId(rowId);
   }
 
-  function disableRemove(rowId: number, indexArray: number) {
-    let lastIndex = randomItems[rowId].callendarArray.length - 1;
+  function disableRemove(
+    rowId: number,
+    indexArray: number,
+    indexOfContract: number
+  ) {
+    let lastIndex =
+      randomItems[rowId].callendarArray[indexOfContract]?.length - 1;
     if (lastIndex === indexArray) {
       setButtonRemoveApproval(false);
     }
@@ -96,9 +106,9 @@ export default function ListComponent() {
         name: "Zakazka " + Math.floor(Math.random() * (i - 2 + 2)),
         dateStart: Math.floor(Math.random() * (10 - 3 + 1)),
         dateEnd: Math.floor(Math.random() * (30 - 5 + 1)),
-        callendarArray: generateRandomArray(stop - start),
+        callendarArray: [generateRandomArray(stop - start)],
         currentState: arrayStates[Math.floor(Math.random() * 3)],
-        upperContract: null,
+        upperContract: [],
         rowIndex: i,
       };
       if (item.dateEnd < item.dateStart) {
@@ -106,7 +116,9 @@ export default function ListComponent() {
         item.dateStart = item.dateEnd;
         item.dateStart = switching;
       }
-      item.callendarArray = generateRandomArray(item.dateEnd - item.dateStart);
+      item.callendarArray[0] = generateRandomArray(
+        item.dateEnd - item.dateStart
+      );
       items.push(item);
     }
     return items;
@@ -199,6 +211,7 @@ export default function ListComponent() {
                 >
                   {item.id + 1}
                 </td>
+
                 <td
                   style={{ width: "10%" }}
                   onClick={() => {
@@ -207,50 +220,83 @@ export default function ListComponent() {
                 >
                   {item.name}
                 </td>
-                {item.callendarArray.map((value, count: number) => {
-                  let style = "dark";
-                  if (item.callendarArray[count - 1] > value) {
-                    style = "white";
-                  }
-                  let classStyle = setColorSpan(item.currentState);
-                  let lastIndex = item.callendarArray.length - 1;
-                  return (
-                    <td
-                      style={{ paddingRight: "50%" }}
-                      width={1.1}
-                      className={`${classStyle}`}
-                      onClick={(e) => {
-                        if (
-                          e.currentTarget.className.match("table-success") ||
-                          e.currentTarget.className.match("table-warning") ||
-                          e.currentTarget.className.match("table-danger")
-                        ) {
-                          openModal(index);
-                        }
-                      }}
-                      onMouseEnter={(e) => enableRemove(item.rowIndex, count)}
-                      onMouseLeave={(e) => disableRemove(item.rowIndex, count)}
-                    >
-                      {buttonRemoveApproval &&
-                        lastIndex === count &&
-                        item.rowIndex === rowId && (
-                          <FontAwesomeIcon
-                            icon={faTrashAlt}
-                            size="sm"
-                            style={{ position: "absolute" }}
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              setShowModal(false);
-                              setButtonRemoveApproval(false);
-                              item.callendarArray = [];
-                              item.dateStart = 1;
-                              item.dateEnd = 1;
-                            }}
-                          />
+                {item.callendarArray.map(
+                  (callendar: number[], indexArray: number) => {
+                    return (
+                      <>
+                        {generateBreaks(item.dateStart - 1)}
+                        {item.callendarArray[indexArray].map(
+                          (value, count: number) => {
+                            let style = "dark";
+                            if (item.callendarArray[0][count - 1] > value) {
+                              style = "white";
+                            }
+                            let classStyle = setColorSpan(item.currentState);
+                            let lastIndex =
+                              item.callendarArray[indexArray]?.length - 1;
+                            return (
+                              <>
+                                <td
+                                  style={{ paddingRight: "50%" }}
+                                  width={1.1}
+                                  className={`${classStyle}`}
+                                  onClick={(e) => {
+                                    if (
+                                      e.currentTarget.className.match(
+                                        "table-success"
+                                      ) ||
+                                      e.currentTarget.className.match(
+                                        "table-warning"
+                                      ) ||
+                                      e.currentTarget.className.match(
+                                        "table-danger"
+                                      )
+                                    ) {
+                                      openModal(index);
+                                    }
+                                  }}
+                                  onMouseEnter={(e) =>
+                                    enableRemove(
+                                      item.rowIndex,
+                                      count,
+                                      indexArray
+                                    )
+                                  }
+                                  onMouseLeave={(e) =>
+                                    disableRemove(
+                                      item.rowIndex,
+                                      count,
+                                      indexArray
+                                    )
+                                  }
+                                >
+                                  {buttonRemoveApproval &&
+                                    lastIndex === count &&
+                                    item.rowIndex === rowId && (
+                                      <FontAwesomeIcon
+                                        icon={faTrashAlt}
+                                        size="sm"
+                                        style={{ position: "absolute" }}
+                                        onClick={(e) => {
+                                          e.stopPropagation();
+                                          setShowModal(false);
+                                          setButtonRemoveApproval(false);
+                                          item.callendarArray = [];
+                                          item.dateStart = 1;
+                                          item.dateEnd = 1;
+                                        }}
+                                      />
+                                    )}
+                                  <br />
+                                </td>
+                              </>
+                            );
+                          }
                         )}
-                    </td>
-                  );
-                })}
+                      </>
+                    );
+                  }
+                )}
               </tr>
             </tbody>
           );
@@ -272,10 +318,19 @@ export default function ListComponent() {
   );
 }
 
+
 export function generateAddingCells(numberOfItems: number) {
   let cells = [];
   for (let index = 1; index < numberOfItems; index++) {
     cells.push(<td key={index} style={{ paddingRight: "50%" }} width={1.1} />);
   }
+  return cells;
+}
+
+export function generateBreaks(numberOfBreaks: number) {
+  let cells = [];
+  for (let index = 0; index < numberOfBreaks; index++) {
+    cells.push(<td style={{ paddingRight: "50%", opacity: 0, border: 0 }} width={1.1}/>);
+  } 
   return cells;
 }

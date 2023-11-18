@@ -20,7 +20,7 @@ interface props {
 interface updateState {
   id: number;
   name: string;
-  upperContract: number | null;
+  upperContract: number[];
   rowIndex: number;
 }
 
@@ -30,6 +30,9 @@ export default function ModalComponent(props: props) {
   const [idState, setIdState] = useState<number>(0);
   const [nameState, setNameState] = useState<string>("");
   const [showError, setErrorText] = useState<string>("");
+  const [selectedUpperContract, setSelectedUpperContract] = useState<number[]>(
+    []
+  );
 
   useEffect(() => {
     setListStates(props.listInitial);
@@ -39,6 +42,8 @@ export default function ModalComponent(props: props) {
   const handleClose = () => {
     props.onDataFromChild(false);
   };
+
+  const [indexToAccess, setIndexToAccess] = useState(1);
 
   function handleStateUpdate(data: updateState) {
     const newItem: randomItems = {
@@ -52,13 +57,23 @@ export default function ModalComponent(props: props) {
       rowIndex: listStates.length,
     };
     setListStates((prevList) => {
-      const updatedList = [...prevList, newItem];
-      props.listUpdate(updatedList);
-      return updatedList;
+      const newList = [...prevList];
+
+      if (selectedUpperContract.length > 0) {
+        newItem.rowIndex = indexToAccess;
+        const updatedList = insertAt(newList, indexToAccess, newItem);
+        props.listUpdate(updatedList);
+        return updatedList;
+      } else {
+        const updatedList = [...newList, newItem];
+        props.listUpdate(updatedList);
+        return updatedList;
+      }
     });
     setNameState("");
     setIdState(0);
     setErrorText("");
+    setSelectedUpperContract([]);
   }
 
   useEffect(() => {
@@ -120,8 +135,27 @@ export default function ModalComponent(props: props) {
                 <DropdownButton id="dropdown-basic-button" title="Zakázka">
                   {listStates.map((item) => {
                     return (
-                      <Dropdown.Item id={item.id.toString()}>
-                        {item.id}
+                      <Dropdown.Item
+                        id={item.id.toString()}
+                        onClick={(e) => {
+                          let newIndexToAccess = item.rowIndex + 1;
+                          setListStates((prevList) => {
+                            // Map over prevList and return a new object for each item with the updated rowIndex
+                            const newList = prevList.map((item, index) => ({
+                              ...item,
+                              rowIndex: index,
+                            }));
+                          
+                            return newList;
+                          });
+                          setIndexToAccess(newIndexToAccess);
+                          setSelectedUpperContract([
+                            ...item.upperContract,
+                            item.rowIndex,
+                          ]);
+                        }}
+                      >
+                        {item.id + 1}
                       </Dropdown.Item>
                     );
                   })}
@@ -136,9 +170,12 @@ export default function ModalComponent(props: props) {
                 handleStateUpdate({
                   id: idState,
                   name: nameState,
-                  upperContract: 100,
+                  upperContract: selectedUpperContract,
                   rowIndex: props.rowId,
                 });
+                listStates.forEach((item, index) => {
+                  listStates[index].rowIndex = index; 
+                })
                 handleClose();
               }}
             >
@@ -149,4 +186,13 @@ export default function ModalComponent(props: props) {
       )}
     </div>
   );
+}
+
+function insertAt(array: randomItems[], index: number, newItem: randomItems) {
+  array.splice(index, 0, newItem);
+  const updatedArray = array.map((item, indexMap) => ({
+    ...item,
+    rowIndex: indexMap,
+  }));
+  return updatedArray;
 }

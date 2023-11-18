@@ -47,6 +47,10 @@ export default function ModalComponent(props: props) {
     });
   }, [props.modalShow, props.listInitial, props.rowId]);
 
+  useEffect(() => {
+    setListStates(props.listInitial);
+  }, [props.listInitial])
+
   const handleClose = () => {
     updateArrayColorObjects()
     props.onDataFromChild(false);
@@ -54,7 +58,7 @@ export default function ModalComponent(props: props) {
 
   function handleDates(id: number) {
     listStates.map((item) => {
-      if (item.id === id) {
+      if (item.rowIndex === id) {
         var dateObject = new Date();
         dateObject.setDate(item.dateStart);
         if (item.dateStart == 0) {
@@ -82,7 +86,7 @@ export default function ModalComponent(props: props) {
       prevListStates.map((item) =>
         item.currentState !==
           props.arrayStates[Number.parseInt(event.currentTarget.id)] &&
-        item.id === props.rowId
+        item.rowIndex === props.rowId
           ? {
               ...item,
               currentState:
@@ -100,9 +104,9 @@ export default function ModalComponent(props: props) {
         item.rowIndex === props.rowId
           ? {
               ...item,
-              callendarArray: generateRandomArray(
+              callendarArray: [generateRandomArray(
                 item.dateEnd - item.dateStart
-              ),
+              )],
             }
           : item
       );
@@ -113,14 +117,14 @@ export default function ModalComponent(props: props) {
   function handleSelectionDates(date: Date) {
     setListStates((prevListStates) => {
       const updatedListState = prevListStates.map((item) =>
-        item.id === props.rowId
+        item.rowIndex === props.rowId
           ? {
               ...item,
               dateStart: firstDateSelected ? date.getDate() : item.dateStart,
               dateEnd: firstDateSelected ? item.dateEnd : date.getDate(),
-              callendarArray: generateRandomArray(
+              callendarArray: [generateRandomArray(
                 item.dateEnd - item.dateStart
-              ),
+              )],
             }
           : item
       );
@@ -135,6 +139,7 @@ export default function ModalComponent(props: props) {
   useEffect(() =>{
     updateArrayColorObjects();
     props.listUpdate(listStates);
+    console.log(listStates);
     
   }, [props.modalShow])
 
