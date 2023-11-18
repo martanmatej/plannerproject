@@ -30,7 +30,9 @@ export default function ModalComponent(props: props) {
   const [idState, setIdState] = useState<number>(0);
   const [nameState, setNameState] = useState<string>("");
   const [showError, setErrorText] = useState<string>("");
-  const [selectedUpperContract, setSelectedUpperContract] = useState<number[]>([]);
+  const [selectedUpperContract, setSelectedUpperContract] = useState<number[]>(
+    []
+  );
 
   useEffect(() => {
     setListStates(props.listInitial);
@@ -41,8 +43,9 @@ export default function ModalComponent(props: props) {
     props.onDataFromChild(false);
   };
 
+  const [indexToAccess, setIndexToAccess] = useState(1);
+
   function handleStateUpdate(data: updateState) {
-    let indexToAccess = 1;
     const newItem: randomItems = {
       id: data.id - 1,
       name: data.name,
@@ -53,20 +56,25 @@ export default function ModalComponent(props: props) {
       currentState: props.arrayStates[0],
       rowIndex: listStates.length,
     };
-    listStates.map((item) => {
-      if (item.id === data.id) {
-        indexToAccess = item.rowIndex+1;
-      }
-    })
     setListStates((prevList) => {
-      const newList = [...prevList]; 
-      if(selectedUpperContract.length > 0){
+      // Map over prevList and return a new object for each item with the updated rowIndex
+      const newList = prevList.map((item, index) => ({
+        ...item,
+        rowIndex: index,
+      }));
+
+      return newList;
+    });
+    setListStates((prevList) => {
+      const newList = [...prevList];
+
+      if (selectedUpperContract.length > 0) {
         insertAt(newList, indexToAccess, newItem);
-        console.log('b', newList)
+        console.log("b", newList);
         props.listUpdate(newList);
         return newList;
       } else {
-        console.log('a')
+        console.log("a");
         const updatedList = [...newList, newItem];
         props.listUpdate(updatedList);
         return updatedList;
@@ -141,9 +149,25 @@ export default function ModalComponent(props: props) {
                       <Dropdown.Item
                         id={item.id.toString()}
                         onClick={(e) => {
-                          setSelectedUpperContract([...item.upperContract, item.rowIndex]);                        }}
+                          setIndexToAccess(0);
+                          setListStates((prevList) => {
+                            // Map over prevList and return a new object for each item with the updated rowIndex
+                            const newList = prevList.map((item, index) => ({
+                              ...item,
+                              rowIndex: index,
+                            }));
+                          
+                            return newList;
+                          });
+                          setIndexToAccess(item.rowIndex + 1);
+                          setSelectedUpperContract([
+                            ...item.upperContract,
+                            item.rowIndex,
+                          ]);
+                          console.log(indexToAccess, "hh", item.rowIndex);
+                        }}
                       >
-                        {item.id}
+                        {item.id + 1}
                       </Dropdown.Item>
                     );
                   })}
