@@ -57,24 +57,14 @@ export default function ModalComponent(props: props) {
       rowIndex: listStates.length,
     };
     setListStates((prevList) => {
-      // Map over prevList and return a new object for each item with the updated rowIndex
-      const newList = prevList.map((item, index) => ({
-        ...item,
-        rowIndex: index,
-      }));
-
-      return newList;
-    });
-    setListStates((prevList) => {
       const newList = [...prevList];
 
       if (selectedUpperContract.length > 0) {
-        insertAt(newList, indexToAccess, newItem);
-        console.log("b", newList);
-        props.listUpdate(newList);
-        return newList;
+        newItem.rowIndex = indexToAccess;
+        const updatedList = insertAt(newList, indexToAccess, newItem);
+        props.listUpdate(updatedList);
+        return updatedList;
       } else {
-        console.log("a");
         const updatedList = [...newList, newItem];
         props.listUpdate(updatedList);
         return updatedList;
@@ -90,7 +80,6 @@ export default function ModalComponent(props: props) {
     if (!showModal) {
       props.listUpdate(listStates);
     }
-    //console.log(listStates);
   }, [showModal, listStates]);
 
   return (
@@ -149,7 +138,7 @@ export default function ModalComponent(props: props) {
                       <Dropdown.Item
                         id={item.id.toString()}
                         onClick={(e) => {
-                          setIndexToAccess(0);
+                          let newIndexToAccess = item.rowIndex + 1;
                           setListStates((prevList) => {
                             // Map over prevList and return a new object for each item with the updated rowIndex
                             const newList = prevList.map((item, index) => ({
@@ -159,12 +148,11 @@ export default function ModalComponent(props: props) {
                           
                             return newList;
                           });
-                          setIndexToAccess(item.rowIndex + 1);
+                          setIndexToAccess(newIndexToAccess);
                           setSelectedUpperContract([
                             ...item.upperContract,
                             item.rowIndex,
                           ]);
-                          console.log(indexToAccess, "hh", item.rowIndex);
                         }}
                       >
                         {item.id + 1}
@@ -185,6 +173,9 @@ export default function ModalComponent(props: props) {
                   upperContract: selectedUpperContract,
                   rowIndex: props.rowId,
                 });
+                listStates.forEach((item, index) => {
+                  listStates[index].rowIndex = index; 
+                })
                 handleClose();
               }}
             >
@@ -199,4 +190,9 @@ export default function ModalComponent(props: props) {
 
 function insertAt(array: randomItems[], index: number, newItem: randomItems) {
   array.splice(index, 0, newItem);
+  const updatedArray = array.map((item, indexMap) => ({
+    ...item,
+    rowIndex: indexMap,
+  }));
+  return updatedArray;
 }
