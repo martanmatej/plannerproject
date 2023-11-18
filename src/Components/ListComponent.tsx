@@ -78,7 +78,7 @@ export default function ListComponent() {
     }
   }
 
-  function setColorSpan(itemState: string) {
+  function setColorSpan(itemState: string, itemContract: number[]) {
     let value: string = "";
     switch (itemState) {
       case arrayStates[2]:
@@ -94,6 +94,11 @@ export default function ListComponent() {
         value = "table-default";
         break;
     }
+
+    if(itemContract.length > 0){
+      value += " td border-top";
+    }
+
     return value;
   }
 
@@ -201,10 +206,10 @@ export default function ListComponent() {
         </thead>
         {randomItems.map((item: randomItems, index: number) => {
           return (
-            <tbody style={{ width: "100%" }}>
+            <tbody style={{ width: "100%", borderCollapse: 'collapse'}} >
               <tr>
                 <td
-                  style={{ width: "5%" }}
+                  style={{ width: "5%"}}
                   onClick={() => {
                     openModalSet(index);
                   }}
@@ -231,14 +236,15 @@ export default function ListComponent() {
                             if (item.callendarArray[0][count - 1] > value) {
                               style = "white";
                             }
-                            let classStyle = setColorSpan(item.currentState);
+                            let classStyle = setColorSpan(item.currentState, item.upperContract);
                             let lastIndex =
                               item.callendarArray[indexArray]?.length - 1;
                             return (
                               <>
                                 <td
-                                  style={{ paddingRight: "50%" }}
+                                  style={{ paddingRight: "50%", borderCollapse: 'collapse' }}
                                   width={1.1}
+                                  
                                   className={`${classStyle}`}
                                   onClick={(e) => {
                                     if (
